@@ -1,9 +1,11 @@
 playtime = {}
 
+local current = {}
+
 local storage = minetest.get_mod_storage()
 
 function playtime.get_current_playtime(name)
-  return os.time() - storage:get_int(name.."-join")
+  return os.time() - current[name]
 end
 
 --  Function to get playtime
@@ -11,14 +13,19 @@ function playtime.get_total_playtime(name)
   return storage:get_int(name) + playtime.get_current_playtime(name)
 end
 
+function playtime.remove_playtime(name)
+  storage:set_string(name, "")
+end
+
 minetest.register_on_leaveplayer(function(player)
   local name = player:get_player_name()
-  storage:set_int(name, storage:get_int(name) + (os.time() - storage:get_int(name.."-join")))
+  storage:set_int(name, storage:get_int(name) + playtime.get_current_playtime(name))
+  current[name] = nil
 end)
 
 minetest.register_on_joinplayer(function(player)
   local name = player:get_player_name()
-  storage:set_int(name.."-join", os.time())
+  current[name] = os.time()
 end)
 
 local function SecondsToClock(seconds)
