@@ -5,7 +5,10 @@ local current = {}
 local storage = minetest.get_mod_storage()
 
 function playtime.get_current_playtime(name)
-  return os.time() - current[name]
+  if current[name] then
+    return os.time() - current[name]
+  else return 0
+  end
 end
 
 --  Function to get playtime
